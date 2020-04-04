@@ -4,9 +4,13 @@ const app = () =>{
     const timePicker = document.querySelectorAll('.time-pick button');
     const elapsedTimeHolder = document.querySelector('.elapsed-time');
     const vid = document.querySelector('.bgVideo');
+    const trackLine = document.querySelector('.moving-outline');
     const audio = new Audio;
     audio.src = 'sounds/beach.mp3';
-    var fakeTime = 120;
+    var fakeTime = 10;
+    trackLine.style.strokeDasharray= "0,10000"
+    //moving track line showing Progress Ring
+    var perimeter = trackLine.r.baseVal.value * 2 * Math.PI;   
 
     //pick the time duration
     timePicker.forEach(btn=>{
@@ -20,7 +24,7 @@ const app = () =>{
     const showElapsed = (time) =>{
         audio.ontimeupdate = ()=>{
             var current = audio.currentTime;
-            if(current<=time){
+            if(current<(time+1)){
                 var seconds = Math.floor(current % 60);
                 if(seconds<10){
                     seconds = '0'+seconds;
@@ -30,12 +34,15 @@ const app = () =>{
                     minutes = '0'+minutes;
                 }
                 elapsedTimeHolder.innerHTML = `${minutes} : ${seconds}`;
+            //update the Progress Ring---------------
+            trackLine.style.strokeDasharray=`${(perimeter/time)*current},${perimeter - (perimeter/time)*current}`;
             }
             else{
                 //song should paused - time is up
                 audio.pause();
                 playPause.src = 'svg/play.svg';
                 playPause.alt = 'play-btn';
+                trackLine.style.strokeDasharray= `0,${perimeter}`;
             }            
        }
     }
